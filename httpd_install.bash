@@ -27,4 +27,4 @@ mv /var/www/html/cloudera-manager/RPMS /var/www/html/cm7/7.1.4/redhat7/yum
 createrepo /var/www/html/cm7/7.1.4/redhat7/yum
 wget https://archive.cloudera.com/cm7/7.1.4/redhat7/yum/RPM-GPG-KEY-cloudera -P /var/www/html/cm7/7.1.4/redhat7/yum
 
-sed -i 's/https:\/\/archive\.clouder\.com/http:\/\/bigdataserver-1/g' /etc/yum.repos.d/cloudera-manager.repo
+sed -i 's/https:\/\/archive\.cloudera\.com/http:\/\/bigdataserver-1/g' /etc/yum.repos.d/cloudera-manager.repo
