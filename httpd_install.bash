@@ -1,18 +1,30 @@
 #!/usr/bin/env bash
-CLOUDERA_MANAGER_REPO_DIR="cm7/7.1.4/redhat7/yum"
-
 yum -y install httpd telnet wget createrepo yum-utils
 systemctl enable httpd
 systemctl start httpd
 systemctl status httpd
 
-wget "https://archive.cloudera.com/${CLOUDERA_MANAGER_REPO_DIR}/cloudera-manager.repo" -P /etc/yum.repos.d
-cd /var/www/html
-mkdir -p ${CLOUDERA_MANAGER_REPO_DIR}
-reposync -r cloudera-manager
-mv cloudera-manager/RPMS ${CLOUDERA_MANAGER_REPO_DIR}
-createrepo ${CLOUDERA_MANAGER_REPO_DIR}
-wget https://archive.cloudera.com/${CLOUDERA_MANAGER_REPO_DIR}/RPM-GPG-KEY-cloudera -P ${CLOUDERA_MANAGER_REPO_DIR}
+cat > /etc/yum.repos.d/cloudera-manager.repo << EOF
+[cloudera-manager]
+name=Cloudera Manager 7.1.4
+baseurl=https://archive.cloudera.com/cm7/7.1.4/redhat7/yum/
+gpgkey=https://archive.cloudera.com/cm7/7.1.4/redhat7/yum/RPM-GPG-KEY-cloudera
+gpgcheck=1
+enabled=1
+autorefresh=0
 
-sed -i "s/^baseurl=.*/http://bigdataserver-1/${CLOUDERA_MANAGER_REPO_DIR}\//g" /etc/yum.repos.d/cloudera-manager.repo
-sed -i "s/^gpgkey=.*/http://bigdataserver-1/${CLOUDERA_MANAGER_REPO_DIR}\/RPM-GPG-KEY-cloudera/g" /etc/yum.repos.d/cloudera-manager.repo
+[postgresql10]
+name=Postgresql 10
+baseurl=https://archive.cloudera.com/postgresql10/redhat7/
+gpgkey=https://archive.cloudera.com/postgresql10/redhat7/RPM-GPG-KEY-PGDG-10
+enabled=1
+gpgcheck=1
+EOF
+
+mkdir -p /var/www/html/cm7/7.1.4/redhat7/yum
+reposync -r cloudera-manager -p /var/www/html
+mv /var/www/html/cloudera-manager/RPMS /var/www/html/cm7/7.1.4/redhat7/yum
+createrepo /var/www/html/cm7/7.1.4/redhat7/yum
+wget https://archive.cloudera.com/cm7/7.1.4/redhat7/yum/RPM-GPG-KEY-cloudera -P /var/www/html/cm7/7.1.4/redhat7/yum
+
+sed -i 's/https:\/\/archive\.clouder\.com/http:\/\/bigdataserver-1/g' /etc/yum.repos.d/cloudera-manager.repo
