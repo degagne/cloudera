@@ -6,10 +6,13 @@ systemctl enable httpd
 systemctl start httpd
 systemctl status httpd
 
-wget "https://archive.cloudera.com/${CLOUDERA_MANAGER_REPO_DIR}/cloudera-manager.repo" -P "/etc/yum.repos.d"
-mkdir -p "/var/www/html/${CLOUDERA_MANAGER_REPO_DIR}"
-reposync -r cloudera-manager -p "/var/www/html"
-mv "/var/www/html/cloudera-manager/RPMS" "/var/www/html/${CLOUDERA_MANAGER_REPO_DIR}"
-createrepo "/var/www/html/${CLOUDERA_MANAGER_REPO_DIR}"
-wget "https://archive.cloudera.com/${CLOUDERA_MANAGER_REPO_DIR}/RPM-GPG-KEY-cloudera" -P "/var/www/html/${CLOUDERA_MANAGER_REPO_DIR}"
-sed -i 's/https\:\/\/archive\.cloudera\.com/http\:\/\/bigdataserver-1/g' "/etc/yum.repos.d/cloudera-manager.repo"
+wget "https://archive.cloudera.com/${CLOUDERA_MANAGER_REPO_DIR}/cloudera-manager.repo" -P /etc/yum.repos.d
+cd /var/www/html
+mkdir -p ${CLOUDERA_MANAGER_REPO_DIR}
+reposync -r cloudera-manager
+mv cloudera-manager/RPMS ${CLOUDERA_MANAGER_REPO_DIR}
+createrepo ${CLOUDERA_MANAGER_REPO_DIR}
+wget https://archive.cloudera.com/${CLOUDERA_MANAGER_REPO_DIR}/RPM-GPG-KEY-cloudera -P ${CLOUDERA_MANAGER_REPO_DIR}
+
+sed -i "s/^baseurl=.*/http://bigdataserver-1/${CLOUDERA_MANAGER_REPO_DIR}\//g" /etc/yum.repos.d/cloudera-manager.repo
+sed -i "s/^gpgkey=.*/http://bigdataserver-1/${CLOUDERA_MANAGER_REPO_DIR}\/RPM-GPG-KEY-cloudera/g" /etc/yum.repos.d/cloudera-manager.repo
